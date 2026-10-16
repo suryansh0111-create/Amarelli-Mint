@@ -127,8 +127,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .c-main{display:flex;gap:14px;align-items:flex-start;margin-top:10px}
 .c-text{flex:1;min-width:0}
 .c-text h2{font:400 clamp(23px,6.6vw,28px)/1.08 var(--serif);letter-spacing:-.012em}
-.c-text p{margin-top:8px;font:400 14px/1.5 var(--serif);color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.is-open .c-text p{-webkit-line-clamp:unset;display:block}
+.c-text p{margin-top:8px;font:400 14px/1.5 var(--serif);color:var(--ink-2)}
+.t-b{display:none;white-space:pre-line}
+.is-open .t-s{display:none}
+.is-open .t-b{display:block}
+.is-open .card{max-height:calc(68svh - 84px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.is-open .c-foot{position:sticky;bottom:-14px;background:var(--card);padding:10px 0 14px;margin-bottom:-14px;z-index:2}
 .thumb{flex:none;width:76px;height:76px;border-radius:3px;background:#E9DEC6 center/contain no-repeat;box-shadow:inset 0 0 0 1px rgba(46,32,16,.1)}
 .more-wrap{display:none}
 .is-open .more-wrap{display:block}
@@ -162,13 +166,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ---------- desktop ---------- */
 @media (min-width:900px){
   :root{--top:80px}
-  .hero{height:100vh;min-height:780px;max-height:1120px;display:grid;grid-template-columns:minmax(300px,1fr) minmax(480px,660px) minmax(320px,400px);column-gap:3vw;padding:var(--top) 4vw 0;
+  .hero{height:auto;min-height:max(100vh,780px);display:grid;grid-template-columns:minmax(300px,1fr) minmax(480px,660px) minmax(320px,400px);column-gap:3vw;padding:var(--top) 4vw 36px;
     grid-template-rows:1fr}
   .topbar{padding:20px 4vw 0;height:var(--top)}
   .logo{height:58px}
   .tagline{font-size:11px}
   .copy{position:relative;left:auto;right:auto;top:auto;grid-column:1;align-self:start;margin-top:8vh;opacity:1!important;transform:none!important;pointer-events:auto}
-  .opened .copy{opacity:1;transform:none}
+  .opened .copy{opacity:1;transform:none;pointer-events:auto}
   .copy h1{font-size:clamp(72px,7.4vw,104px)}
   .copy .sub{font-size:19px;max-width:20ch;margin-top:26px}
   .copy .spec{display:block;margin-top:34px;padding-top:26px;position:relative;font:500 10px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2)}
@@ -192,7 +196,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   .card{padding:28px 30px 26px}
   .c-main{flex-direction:column;gap:0;margin-top:16px}
   .c-text h2{font-size:34px}
-  .c-text p{display:block;-webkit-line-clamp:unset;font-size:17px;line-height:1.55;margin-top:16px;padding-bottom:20px;position:relative}
+  .t-s{display:none}.t-b{display:block}
+  .is-open .card{max-height:none;overflow:visible}
+  .is-open .c-foot{position:static;background:none;padding:16px 0 0;margin-bottom:0}
+  .c-text p{display:block;font-size:17px;line-height:1.55;margin-top:16px;padding-bottom:20px;position:relative}
   .c-text p::after{content:"";position:absolute;left:0;bottom:0;width:40px;height:1px;background:var(--ink)}
   .thumb{width:100%;height:150px;margin-top:22px}
   .more-wrap{display:block}
@@ -280,7 +287,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <div class="c-in" id="cin">
         <div class="c-head"><span id="c-eyebrow"></span><span class="sel">Selected</span></div>
         <div class="c-main">
-          <div class="c-text"><h2 id="c-title"></h2><p id="c-body"></p></div>
+          <div class="c-text"><h2 id="c-title"></h2><p id="c-body"><span class="t-s" id="c-short"></span><span class="t-b" id="c-long"></span></p></div>
           <div class="thumb" id="c-thumb" role="img" aria-label=""></div>
         </div>
         <div class="more-wrap"><ul class="facts" id="c-facts"></ul></div>
@@ -323,21 +330,11 @@ const WW=590, WH=895;
 const ORDER=['lid','mint','leaf','rim','base'];
 const NAME={lid:'Lid',mint:'Mint Pieces',leaf:'Mint Leaves',rim:'Rim & Seam',base:'Tin Base'};
 const INFO={
-  lid:{n:'01',cat:'Packaging',title:'The Illustrated Lid',
-    body:'The vintage illustration, distinctive red border and old-world typography give this small tin its recognisable character. The lid sets the tone for the entire experience — a blend of tradition, craft and Italian charm.',
-    facts:[['Border','Deep red'],['Lettering','Old-world serif'],['Net weight','20 g · 0.7 oz']]},
-  mint:{n:'02',cat:'The liquorice',title:'Liquorice Pieces',
-    body:'Small, dark and softly squared, each piece is liquorice flavoured with mint. The rich, earthy depth of liquorice comes first; a cool, fresh finish follows close behind.',
-    facts:[['Flavour','Liquorice & mint'],['Shape','Small squares'],['Origin','Calabria, Italy']]},
-  leaf:{n:'03',cat:'The flavour',title:'Fresh Mint Leaves',
-    body:'The refreshing note in the blend. A hint of mint lifts the rich, earthy taste of liquorice and keeps every piece balanced — never too heavy, never too sweet.',
-    facts:[['Role','The cool, fresh note'],['Paired with','Liquorice'],['Character','Green & bright']]},
-  rim:{n:'04',cat:'Craft',title:'Rim & Seam',
-    body:'A slim ring of bright metal where lid meets base. It is the quiet detail that closes the tin neatly — the small, well-made part you only notice when you look closely.',
-    facts:[['Role','Closes the tin'],['Finish','Bright metal'],['Sits','Between lid & base']]},
-  base:{n:'05',cat:'Packaging',title:'The Tin Base',
-    body:'A warm, gold-toned tin with a softly worn finish. Compact enough for a pocket, and made to be kept long after the last piece is gone.',
-    facts:[['Finish','Aged gold tone'],['Size','Pocket-sized'],['Holds','20 g']]}
+  lid:{"n": "01", "cat": "Packaging", "title": "The Illustrated Lid", "short": "A vintage illustrated lid with a red border and old-world lettering — the tin’s recognisable face.", "body": "The lid is the face of the tin: a vintage illustration of gnomes in a woodland scene, framed by a bold red border and old-world lettering that names the brand and the product — liquorice flavoured with mint, 20 g (0.7 oz).\n\nBesides closing the tin, its job is character. It sets the tone for everything inside, and it is the reason the tin is described by retailers as a collectible.", "facts": [["Border", "Deep red"], ["Lettering", "Old-world serif"], ["Net weight", "20 g · 0.7 oz"]]},
+  mint:{"n": "02", "cat": "The liquorice", "title": "Liquorice Pieces", "short": "Dark, mint-flavoured liquorice pieces with a pronounced bittersweet character.", "body": "Dark liquorice pieces with a pronounced bittersweet character. The mint flavour adds an aromatic note, but the overall taste can come across as bitter and intense rather than sweet or refreshing.\n\nRetailer listings describe them as small, mint-flavoured liquorice pieces made from pure liquorice root extract. The taste description above is a subjective tasting impression, not a manufacturer’s claim, and palates differ.", "facts": [["Flavour", "Liquorice with mint"], ["Form", "Small pieces"], ["Tasting note", "Bittersweet, intense"]]},
+  leaf:{"n": "03", "cat": "The flavour", "title": "Mint Leaves", "short": "The leaves illustrate the mint flavour — they are artwork, not whole leaves inside the tin.", "body": "The leaves in this view represent the mint flavouring. They are a visual shorthand to explain the product, not a sign that whole mint leaves are inside: the ingredients listed for this tin by retailers are liquorice and natural mint flavour.\n\nIn the tin, the mint appears as an aromatic note alongside the liquorice. In one tasting it read as aromatic rather than refreshing. Please check the ingredient list printed on your own tin.", "facts": [["Represents", "Mint flavour"], ["Listed as", "Natural mint flavour"], ["In the tin", "Flavouring, not leaves"]]},
+  rim:{"n": "04", "cat": "Craft", "title": "Rim & Seam", "short": "The slim metal ring at the joint between lid and base, where the tin closes.", "body": "The rim and seam are the slim metal ring at the joint between the lid and the base — the point where the two halves of the tin meet and close. It is a small piece of construction rather than decoration, and the part you are least likely to notice once the tin is shut.\n\nThe exploded view shows it as a separate ring to explain how the tin comes together.", "facts": [["Role", "Closes the tin"], ["Finish", "Bright metal"], ["Sits", "Between lid & base"]]},
+  base:{"n": "05", "cat": "Packaging", "title": "The Tin Base", "short": "The gold-toned metal body that holds the liquorice — compact and made to be kept.", "body": "The base is the body of the tin: a warm, gold-toned metal container, shown here with a softly worn finish, that holds the 20 g of liquorice pieces. It is compact enough to carry.\n\nAs the lid artwork suggests, it is a keepsake as much as a container — retailers describe it as a collectible vintage-style tin, made to be kept once the pieces are gone.", "facts": [["Finish", "Aged gold tone"], ["Holds", "20 g"], ["Type", "Collectible tin"]]}
 };
 
 /* ---------- parts ---------- */
@@ -436,7 +433,7 @@ const cin=$('#cin');let cAnim=null;
 function fillCard(g,p){
   const d=INFO[g];
   $('#c-eyebrow').innerHTML=`<b style="font-weight:600;color:var(--ink)">${d.n}</b> &nbsp;/&nbsp; ${d.cat}`;
-  $('#c-title').textContent=d.title;$('#c-body').textContent=d.body;
+  $('#c-title').textContent=d.title;$('#c-short').textContent=d.short;$('#c-long').textContent=d.body;
   const th=$('#c-thumb');
   const src=(p||(g==='mint'?byG('mint')[5]:g==='leaf'?byG('leaf')[3]:byG(g)[0])).img.src;
   th.style.backgroundImage=`url("${src}")`;
